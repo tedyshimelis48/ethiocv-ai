@@ -1,3 +1,5 @@
+import { Mail, MapPin, Phone } from "lucide-react";
+
 interface Props {
   data: any;
   summary: string;
@@ -10,7 +12,7 @@ export default function CorporateTemplate({
   return (
     <div
       id="cv-template"
-      className="w-[850px] mx-auto bg-white flex shadow-2xl overflow-hidden"
+      className="w-[794px] min-h-[1123px] mx-auto bg-white flex shadow-2xl overflow-hidden"
     >
       {/* LEFT SIDEBAR */}
       <div className="w-[32%] bg-[#f7f5f5] p-8 border-r border-gray-200">
@@ -31,45 +33,29 @@ export default function CorporateTemplate({
           </div>
         </div>
 
-        {/* CONTACT */}
-        <div className="mt-12">
-          <h2 className="text-[#5a1f46] text-[22px] font-bold tracking-wide uppercase border-b-[3px] border-[#5a1f46] pb-2">
-            Contact
-          </h2>
+<div className="mt-4 space-y-4 text-sm">
+  <h2 className="text-[#5a1f46] text-[20px] font-bold tracking-wide uppercase border-b-[3px] border-[#5a1f46] pb-2">
+    Contact
+  </h2>
+  <div className="flex items-center gap-3">
+    <Phone size={16} />
+    <p>{data.phone}</p>
+  </div>
 
-          <div className="mt-5 space-y-4 text-[15px] text-gray-700">
+  <div className="flex items-center gap-3">
+    <Mail size={16} />
+    <p>{data.email}</p>
+  </div>
 
-            <div>
-              <p className="font-semibold text-[#5a1f46]">
-                Phone
-              </p>
-
-              <p>{data.phone}</p>
-            </div>
-
-            <div>
-              <p className="font-semibold text-[#5a1f46]">
-                Email
-              </p>
-
-              <p className="break-words">
-                {data.email}
-              </p>
-            </div>
-
-            <div>
-              <p className="font-semibold text-[#5a1f46]">
-                Address
-              </p>
-
-              <p>{data.address}</p>
-            </div>
-          </div>
-        </div>
+  <div className="flex items-start gap-3">
+    <MapPin size={16} className="mt-1" />
+    <p>{data.address}</p>
+  </div>
+</div>
 
         {/* SKILLS */}
         <div className="mt-12">
-          <h2 className="text-[#5a1f46] text-[22px] font-bold tracking-wide uppercase border-b-[3px] border-[#5a1f46] pb-2">
+          <h2 className="text-[#5a1f46] text-[20px] font-bold tracking-wide uppercase border-b-[3px] border-[#5a1f46] pb-2">
             Skills
           </h2>
 
@@ -89,8 +75,8 @@ export default function CorporateTemplate({
 
         {/* EDUCATION SHORT */}
         <div className="mt-12">
-          <h2 className="text-[#5a1f46] text-[22px] font-bold tracking-wide uppercase border-b-[3px] border-[#5a1f46] pb-2">
-            Education
+          <h2 className="text-[#5a1f46] text-[20px] font-bold tracking-wide uppercase border-b-[3px] border-[#5a1f46] pb-2">
+            Language
           </h2>
 
           <p className="mt-5 text-[15px] leading-7 text-gray-700 whitespace-pre-line">
@@ -125,7 +111,7 @@ export default function CorporateTemplate({
 
               <div className="w-4 h-4 rounded-full bg-[#5a1f46]"></div>
 
-              <h2 className="text-[#5a1f46] text-[26px] font-bold uppercase tracking-wide">
+              <h2 className="text-[#5a1f46] text-[20px] font-bold uppercase tracking-wide">
                 Profile
               </h2>
             </div>
@@ -141,7 +127,7 @@ export default function CorporateTemplate({
 
               <div className="w-4 h-4 rounded-full bg-[#5a1f46]"></div>
 
-              <h2 className="text-[#5a1f46] text-[26px] font-bold uppercase tracking-wide">
+              <h2 className="text-[#5a1f46] text-[20px] font-bold uppercase tracking-wide">
                 Experience
               </h2>
             </div>
@@ -157,7 +143,7 @@ export default function CorporateTemplate({
 
               <div className="w-4 h-4 rounded-full bg-[#5a1f46]"></div>
 
-              <h2 className="text-[#5a1f46] text-[26px] font-bold uppercase tracking-wide">
+              <h2 className="text-[#5a1f46] text-[20px] font-bold uppercase tracking-wide">
                 Education
               </h2>
             </div>

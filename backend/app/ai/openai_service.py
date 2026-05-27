@@ -19,9 +19,24 @@ def generate_cv_summary(
 ):
     try:
         prompt = f"""
-        You are a professional CV writer.
+        
+You are a professional ATS resume writer.
 
-        Create a professional CV summary for:
+You ONLY return clean professional summary text.
+
+Never include:
+- headings
+- titles
+- markdown
+- labels
+- explanations
+- bullet points unless requested
+- introductory text
+- closing text
+
+Return only the summary itself.
+
+        
 
         Job Title: {job_title}
 
@@ -31,11 +46,15 @@ def generate_cv_summary(
         Skills:
         {skills}
 
-        Rules:
-        - Professional tone
-        - Simple English
-        - Maximum 5 lines
-        - ATS-friendly
+IMPORTANT OUTPUT RULES:
+- Return ONLY the professional summary text
+- Do NOT add titles or headings
+- Do NOT write "Professional Summary"
+- Do NOT write "CV Summary"
+- Do NOT use markdown formatting
+- Do NOT use asterisks (**)
+- Do NOT include notes in brackets or parentheses
+- Start directly with the summary content
         """
 
         response = client.chat.completions.create(

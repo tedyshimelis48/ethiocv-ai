@@ -2,11 +2,14 @@
 import { supabase } from "@/lib/supabase";
 import axios from "axios";
 import { useState } from "react";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
 import NGOTemplate from "../templates/NGOTemplate";
 import CorporateTemplate from "../templates/CorporateTemplate";
 import ImageUpload from "./ImageUpload";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import CorporatePDF from "../pdf/CorporatePDF";
+import NGOPDF from "../pdf/NGOPDF";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 export default function CVForm() {
   const [summary, setSummary] = useState("");
@@ -27,16 +30,23 @@ const [formData, setFormData] = useState({
 const [selectedTemplate, setSelectedTemplate] =
   useState("ngo");
 
-  const downloadPDF = async () => {
+const downloadPDF = async () => {
+
   const input = document.getElementById(
     "cv-template"
   );
 
   if (!input) return;
 
-  const canvas = await html2canvas(input);
+  const canvas = await html2canvas(input, {
+    scale: 3,
+    useCORS: true,
+    backgroundColor: "#ffffff",
+  });
 
-  const imgData = canvas.toDataURL("image/png");
+  const imgData = canvas.toDataURL(
+    "image/png"
+  );
 
   const pdf = new jsPDF({
     orientation: "portrait",
@@ -44,10 +54,11 @@ const [selectedTemplate, setSelectedTemplate] =
     format: "a4",
   });
 
-  const pdfWidth = pdf.internal.pageSize.getWidth();
+  const pdfWidth =
+    pdf.internal.pageSize.getWidth();
 
   const pdfHeight =
-    (canvas.height * pdfWidth) / canvas.width;
+    pdf.internal.pageSize.getHeight();
 
   pdf.addImage(
     imgData,
@@ -75,7 +86,7 @@ const [selectedTemplate, setSelectedTemplate] =
     const response = await axios.post(
       "http://127.0.0.1:8000/ai/generate-summary",
       {
-        job_title: "Software Engineer",
+        job_title: formData.jobTitle,
         experience: formData.experience,
         skills: formData.skills,
       }
@@ -120,22 +131,33 @@ const handleSubmit = async () => {
   }
 };
 
-  return (
-    <div className="max-w-3xl mx-auto space-y-5">
-       <select
-    className="border p-3 rounded w-full"
-    onChange={(e) =>
-      setSelectedTemplate(e.target.value)
-    }
-  >
-    <option value="ngo">
-      NGO Template
-    </option>
+return (
+  <div className="flex gap-8 items-start">
 
-    <option value="corporate">
-      Corporate Template
-    </option>
-  </select>
+    {/* LEFT SIDE - FORM */}
+    <div className="w-1/2 bg-white p-8 rounded-2xl shadow-lg space-y-5 sticky top-5 h-[95vh] overflow-y-auto">
+
+      <h1 className="text-3xl font-bold text-[#5a1f46]">
+        Build Your CV
+      </h1>
+
+      {/* TEMPLATE SELECT */}
+      <select
+        className="border p-3 rounded w-full"
+        onChange={(e) =>
+          setSelectedTemplate(e.target.value)
+        }
+      >
+        <option value="ngo">
+          NGO Template
+        </option>
+
+        <option value="corporate">
+          Corporate Template
+        </option>
+      </select>
+
+      {/* FULL NAME */}
       <input
         type="text"
         name="fullName"
@@ -144,24 +166,37 @@ const handleSubmit = async () => {
         onChange={handleChange}
       />
 
+      {/* JOB TITLE */}
       <input
-  type="text"
-  name="jobTitle"
-  placeholder="Job Title"
-  className="w-full border p-3 rounded"
-  onChange={handleChange}
-/>
+        type="text"
+        name="jobTitle"
+        placeholder="Job Title"
+        className="w-full border p-3 rounded"
+        onChange={handleChange}
+      />
 
-<ImageUpload
-  setImageUrl={(url) =>
-    setFormData({
-      ...formData,
-      profileImage: url,
-    })
-  }
-/>
+      {/* IMAGE UPLOAD */}
+      <ImageUpload
+        setImageUrl={(url) =>
+          setFormData((prev) => ({
+            ...prev,
+            profileImage: url,
+          }))
+        }
+      />
 
+      {/* IMAGE PREVIEW */}
+      {formData.profileImage && (
+        <div className="flex justify-center">
+          <img
+            src={formData.profileImage}
+            alt="preview"
+            className="w-32 h-32 rounded-full object-cover border-4 border-[#5a1f46]"
+          />
+        </div>
+      )}
 
+      {/* EMAIL */}
       <input
         type="email"
         name="email"
@@ -170,6 +205,7 @@ const handleSubmit = async () => {
         onChange={handleChange}
       />
 
+      {/* PHONE */}
       <input
         type="text"
         name="phone"
@@ -178,6 +214,7 @@ const handleSubmit = async () => {
         onChange={handleChange}
       />
 
+      {/* ADDRESS */}
       <input
         type="text"
         name="address"
@@ -186,6 +223,7 @@ const handleSubmit = async () => {
         onChange={handleChange}
       />
 
+      {/* EDUCATION */}
       <textarea
         name="education"
         placeholder="Education"
@@ -194,6 +232,7 @@ const handleSubmit = async () => {
         onChange={handleChange}
       />
 
+      {/* EXPERIENCE */}
       <textarea
         name="experience"
         placeholder="Work Experience"
@@ -202,56 +241,99 @@ const handleSubmit = async () => {
         onChange={handleChange}
       />
 
+      {/* SKILLS */}
       <textarea
         name="skills"
-        placeholder="Skills"
+        placeholder="Skills (comma separated)"
         rows={3}
         className="w-full border p-3 rounded"
         onChange={handleChange}
       />
 
-<textarea
-  placeholder="Professional Summary"
-  value={summary}
-  onChange={(e) => setSummary(e.target.value)}
-  rows={5}
-  className="w-full border p-3 rounded"
-/>
+      {/* SUMMARY */}
+      <textarea
+        placeholder="Professional Summary"
+        value={summary}
+        onChange={(e) =>
+          setSummary(e.target.value)
+        }
+        rows={5}
+        className="w-full border p-3 rounded"
+      />
 
-<button
-  onClick={generateSummary}
-  className="bg-blue-600 text-white px-6 py-3 rounded"
+      {/* BUTTONS */}
+      <div className="flex gap-4 flex-wrap">
+
+        <button
+          onClick={generateSummary}
+          className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition"
+        >
+          Generate AI Summary
+        </button>
+
+        <button
+          onClick={handleSubmit}
+          className="bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition"
+        >
+          Save CV
+        </button>
+
+<PDFDownloadLink
+  document={
+    selectedTemplate === "ngo" ? (
+      <NGOPDF
+        data={formData}
+        summary={summary}
+      />
+    ) : (
+      <CorporatePDF
+        data={formData}
+        summary={summary}
+      />
+    )
+  }
+  fileName="EthioCV.pdf"
 >
-  Generate AI Summary
-</button>
-
-      <button
-        onClick={handleSubmit}
-        className="bg-black text-white px-6 py-3 rounded"
-      >
-        Save CV
-      </button>
-
-      <button
-  onClick={downloadPDF}
-  className="bg-green-600 text-white px-6 py-3 rounded"
->
-  Download PDF
-</button>
-
-<div className="mt-10">
-{selectedTemplate === "ngo" ? (
-  <NGOTemplate
-    data={formData}
-    summary={summary}
-  />
-) : (
-  <CorporateTemplate
-    data={formData}
-    summary={summary}
-  />
+  {({ loading }) => (
+  <button
+    disabled={!summary || loading}
+    className={`
+      px-6 py-3 rounded-lg text-white transition
+      ${
+        !summary || loading
+          ? "bg-gray-400 cursor-not-allowed"
+          : "bg-green-600 hover:bg-green-700"
+      }
+    `}
+  >
+    {loading
+      ? "Generating PDF..."
+      : "Download PDF"}
+  </button>
 )}
-</div>
+</PDFDownloadLink>
+      </div>
     </div>
-  );
+
+    {/* RIGHT SIDE - LIVE PREVIEW */}
+    <div className="w-1/2 h-screen overflow-y-auto flex justify-center">
+
+      <div className="scale-[0.6] origin-top sticky top-5">
+
+        {selectedTemplate === "ngo" ? (
+          <NGOTemplate
+            data={formData}
+            summary={summary}
+          />
+        ) : (
+          <CorporateTemplate
+            data={formData}
+            summary={summary}
+          />
+        )}
+
+      </div>
+    </div>
+  </div>
+);
 }
