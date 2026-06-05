@@ -95,7 +95,7 @@ const downloadPDF = async () => {
     });
   };
 
-  const generateSummary = async () => {
+const generateSummary = async () => {
   try {
     const response = await axios.post(
       `${process.env.NEXT_PUBLIC_API_URL}/ai/generate-summary`,
@@ -108,9 +108,21 @@ const downloadPDF = async () => {
 
     setSummary(response.data.summary);
 
-  } catch (error) {
-    console.log(error);
-    alert("AI generation failed");
+  } catch (error: any) {
+    console.error("AI ERROR FULL:", error);
+
+    if (error.response) {
+      console.error("STATUS:", error.response.status);
+      console.error("DATA:", error.response.data);
+
+      alert(
+        `AI Error ${error.response.status}: ${JSON.stringify(error.response.data)}`
+      );
+    } else if (error.request) {
+      alert("No response from backend (network/CORS issue)");
+    } else {
+      alert(error.message);
+    }
   }
 };
 
